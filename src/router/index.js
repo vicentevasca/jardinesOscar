@@ -25,6 +25,7 @@ const router = createRouter({
         { path: '',             redirect: '/admin/mensajes' },
         { path: 'mensajes',     name: 'admin-mensajes',      component: () => import('../views/admin/MessagesView.vue') },
         { path: 'herramientas', name: 'admin-herramientas',  component: () => import('../views/admin/ToolsView.vue') },
+        { path: 'textos',       name: 'admin-textos',        component: () => import('../views/admin/TextEditorView.vue') },
       ],
     },
   ],
