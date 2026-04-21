@@ -11,9 +11,11 @@
     </div>
 
     <div class="flex items-center gap-3">
-      <span v-if="pendingCount > 0" class="text-green-300" style="font-size: 12px;">
-        {{ pendingCount }} {{ pendingCount === 1 ? 'cambio pendiente' : 'cambios pendientes' }}
+      <span v-if="pendingCount > 0" class="text-green-300 flex items-center gap-1.5" style="font-size: 12px;">
+        <span class="w-1.5 h-1.5 rounded-full bg-green-400" />
+        {{ pendingCount }} {{ pendingCount === 1 ? 'cambio sin guardar' : 'cambios sin guardar' }}
       </span>
+      <span v-else class="text-white/30" style="font-size: 12px;">Sin cambios aún · haz click en una imagen</span>
       <button
         @click="$emit('cancel')"
         class="text-white/70 hover:text-white transition-colors px-3 py-1.5 border border-white/20 hover:border-white/40"
@@ -35,6 +37,12 @@
 </template>
 
 <script setup>
+import { onMounted, onUnmounted } from 'vue'
+
 defineProps({ pendingCount: Number, saving: Boolean })
-defineEmits(['save', 'cancel'])
+const emit = defineEmits(['save', 'cancel'])
+
+const onKey = (e) => { if (e.key === 'Escape') emit('cancel') }
+onMounted(()   => window.addEventListener('keydown', onKey))
+onUnmounted(() => window.removeEventListener('keydown', onKey))
 </script>

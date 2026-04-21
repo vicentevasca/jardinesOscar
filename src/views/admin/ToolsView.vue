@@ -32,20 +32,25 @@
           </div>
           <button
             @click="openEditMode"
-            class="flex items-center gap-2 px-5 py-2.5 text-white font-medium transition-opacity hover:opacity-85"
+            :disabled="activating"
+            class="flex items-center gap-2 px-5 py-2.5 text-white font-medium transition-all"
             style="background: #2d5a3d; border: none; font-size: 14px; cursor: pointer;"
+            :style="activating ? 'opacity:0.7;cursor:not-allowed' : 'cursor:pointer'"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg v-if="activating" class="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4"/>
+            </svg>
+            <svg v-else width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
               <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
             </svg>
-            Activar modo edición
+            {{ activating ? 'Abriendo sitio...' : 'Activar modo edición' }}
           </button>
         </div>
       </div>
 
       <!-- Placeholder future tools -->
-      <div class="bg-white border border-black/6 p-7 flex items-start gap-6 opacity-50">
+      <div class="bg-white border border-black/6 p-7 flex items-start gap-6 opacity-50" title="Próximamente disponible">
         <div class="w-12 h-12 rounded-full flex items-center justify-center shrink-0" style="background: #f5f4f1;">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.8">
             <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
@@ -61,14 +66,18 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { usePhotoEditor } from '../../composables/usePhotoEditor.js'
 
-const router = useRouter()
-const editor = usePhotoEditor()
+const router    = useRouter()
+const editor    = usePhotoEditor()
+const activating = ref(false)
 
-function openEditMode() {
+async function openEditMode() {
+  activating.value = true
   editor.activate()
+  await new Promise(r => setTimeout(r, 400))
   router.push('/?edit=photos')
 }
 </script>

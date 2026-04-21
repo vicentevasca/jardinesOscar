@@ -43,28 +43,48 @@
         <button
           type="submit"
           :disabled="loading"
-          class="mt-2 py-3.5 text-white font-medium transition-all"
+          class="mt-2 py-3.5 text-white font-medium transition-all flex items-center justify-center gap-2"
           style="background: #2d5a3d; border: none; font-size: 15px; cursor: pointer; letter-spacing: 0.02em;"
-          :style="loading ? 'opacity:0.6;cursor:not-allowed' : ''"
+          :style="loading ? 'opacity:0.65;cursor:not-allowed' : ''"
         >
+          <svg v-if="loading" class="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+          </svg>
           {{ loading ? 'Ingresando...' : 'Ingresar' }}
         </button>
       </form>
 
-      <p class="text-center text-green-200/30 mt-8" style="font-size: 12px;">
-        Acceso restringido
-      </p>
+      <div class="flex items-center justify-between mt-8">
+        <RouterLink
+          to="/"
+          class="no-underline transition-colors flex items-center gap-1.5"
+          style="font-size: 12px; color: rgba(187,239,196,0.3);"
+          @mouseenter="e => e.currentTarget.style.color = 'rgba(187,239,196,0.6)'"
+          @mouseleave="e => e.currentTarget.style.color = 'rgba(187,239,196,0.3)'"
+        >
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 5l-7 7 7 7"/>
+          </svg>
+          Volver al sitio
+        </RouterLink>
+        <span class="text-green-200/25" style="font-size: 12px;">Acceso restringido</span>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '../composables/useAuth.js'
 
 const router  = useRouter()
 const auth    = useAuth()
+
+// Skip login if already authenticated
+onMounted(async () => {
+  if (auth.isAuth) router.replace('/admin')
+})
 const email   = ref('')
 const password = ref('')
 const loading = ref(false)

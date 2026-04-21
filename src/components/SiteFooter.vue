@@ -56,7 +56,23 @@
       </div>
       <div class="pt-7 border-t border-white/14 flex justify-between items-center flex-wrap gap-4 text-green-200 tracking-[0.06em]" style="font-size: 12px;">
         <span>© {{ year }} OSCAR PALMA · LANDSCAPE & GARDEN STUDIO</span>
-        <span>SANTIAGO · CHILE</span>
+        <div class="flex items-center gap-4">
+          <span>SANTIAGO · CHILE</span>
+          <!-- Discrete admin access — only visible on hover -->
+          <RouterLink
+            to="/login"
+            title="Administración"
+            class="transition-opacity no-underline"
+            style="opacity: 0.18; color: inherit;"
+            @mouseenter="e => e.currentTarget.style.opacity = '0.55'"
+            @mouseleave="e => e.currentTarget.style.opacity = '0.18'"
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </RouterLink>
+        </div>
       </div>
     </div>
   </footer>

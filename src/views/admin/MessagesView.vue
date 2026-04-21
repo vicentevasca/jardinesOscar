@@ -10,7 +10,9 @@
       <div class="px-6 py-5 border-b border-black/10 flex items-center justify-between sticky top-0 bg-white z-10">
         <div>
           <h1 class="font-display font-normal m-0" style="font-size: 20px; letter-spacing: -0.02em;">Mensajes</h1>
-          <p class="text-ink-500 m-0 mt-0.5" style="font-size: 12px;">{{ leads.length }} contactos recibidos</p>
+          <p class="text-ink-500 m-0 mt-0.5" style="font-size: 12px;">
+            <span v-if="unreadCount > 0" class="text-green-700 font-medium">{{ unreadCount }} sin leer · </span>{{ leads.length }} total
+          </p>
         </div>
         <button @click="fetchLeads" class="text-ink-400 hover:text-ink-900 bg-transparent border-0 cursor-pointer p-1 transition-colors" title="Actualizar">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -85,8 +87,10 @@
           <p class="text-ink-500 m-0 mt-0.5" style="font-size: 12px;">{{ formatDateFull(selected.created_at) }}</p>
         </div>
         <a
-          :href="`https://wa.me/${selected.telefono.replace(/\D/g,'')}?text=Hola%20${encodeURIComponent(selected.nombre)}%2C%20recibimos%20tu%20consulta.`"
+          v-if="waUrl(selected)"
+          :href="waUrl(selected)"
           target="_blank"
+          rel="noopener noreferrer"
           class="ml-auto flex items-center gap-2 px-4 py-2 text-white no-underline transition-opacity hover:opacity-80"
           style="background: #25D366; font-size: 13px; font-weight: 500;"
         >
@@ -129,9 +133,11 @@
 import { ref, computed, onMounted } from 'vue'
 import { supabase } from '../../lib/supabase.js'
 
-const leads   = ref([])
+const leads    = ref([])
 const selected = ref(null)
 const loading  = ref(false)
+
+const unreadCount = computed(() => leads.value.filter(l => !l.read).length)
 
 async function fetchLeads() {
   loading.value = true
@@ -149,6 +155,12 @@ async function openLead(lead) {
     await supabase.from('leads').update({ read: true }).eq('id', lead.id)
     lead.read = true
   }
+}
+
+function waUrl(lead) {
+  const phone = lead?.telefono?.replace(/\D/g, '')
+  if (!phone) return null
+  return `https://wa.me/${phone}?text=Hola%20${encodeURIComponent(lead.nombre)}%2C%20recibimos%20tu%20consulta.`
 }
 
 const detailFields = computed(() => selected.value ? [

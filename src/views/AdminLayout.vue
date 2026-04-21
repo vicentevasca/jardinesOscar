@@ -22,18 +22,35 @@
           style="font-size: 13px;"
         >
           <component :is="link.icon" class="w-4 h-4 shrink-0" />
-          {{ link.label }}
+          <span class="flex-1">{{ link.label }}</span>
+          <!-- Unread badge -->
+          <span
+            v-if="link.to === '/admin/mensajes' && unreadCount > 0"
+            class="text-white font-semibold rounded-full flex items-center justify-center shrink-0"
+            style="background: #4a7c5a; font-size: 10px; min-width: 18px; height: 18px; padding: 0 5px;"
+          >{{ unreadCount }}</span>
         </RouterLink>
       </nav>
 
       <!-- Footer -->
-      <div class="px-5 py-5 border-t border-white/10">
+      <div class="px-5 py-4 border-t border-white/10 flex flex-col gap-3">
+        <RouterLink
+          to="/"
+          class="flex items-center gap-2 no-underline transition-colors text-green-200/40 hover:text-green-200/80"
+          style="font-size: 12px;"
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+          Ver sitio
+        </RouterLink>
         <button
           @click="signOut"
           class="flex items-center gap-2 text-green-200/50 hover:text-white transition-colors bg-transparent border-0 cursor-pointer p-0"
           style="font-size: 12px;"
         >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
           </svg>
           Cerrar sesión
@@ -50,12 +67,28 @@
 </template>
 
 <script setup>
-import { h }           from 'vue'
-import { useRouter }   from 'vue-router'
+import { h, ref, onMounted, watch }  from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuth }     from '../composables/useAuth.js'
+import { supabase }    from '../lib/supabase.js'
 
 const router = useRouter()
+const route  = useRoute()
 const auth   = useAuth()
+
+const unreadCount = ref(0)
+
+async function fetchUnread() {
+  const { count } = await supabase
+    .from('leads')
+    .select('*', { count: 'exact', head: true })
+    .eq('read', false)
+  unreadCount.value = count || 0
+}
+
+onMounted(fetchUnread)
+// Refresh badge when coming back from mensajes
+watch(() => route.path, fetchUnread)
 
 async function signOut() {
   await auth.signOut()
