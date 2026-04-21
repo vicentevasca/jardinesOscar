@@ -24,5 +24,30 @@ create policy "auth_update_leads" on public.leads
   using (true)
   with check (true);
 
--- Storage bucket for site images (run once manually if not using migrations)
--- In Supabase dashboard: Storage → New bucket → "site-images" → Public
+-- Storage: create public bucket for site images
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values (
+  'site-images',
+  'site-images',
+  true,
+  8388608,  -- 8 MB
+  array['image/jpeg','image/png','image/webp','image/gif']
+)
+on conflict (id) do nothing;
+
+-- Storage RLS policies on storage.objects
+create policy "site_images_public_read" on storage.objects
+  for select to anon, authenticated
+  using (bucket_id = 'site-images');
+
+create policy "site_images_auth_upload" on storage.objects
+  for insert to authenticated
+  with check (bucket_id = 'site-images');
+
+create policy "site_images_auth_update" on storage.objects
+  for update to authenticated
+  using (bucket_id = 'site-images');
+
+create policy "site_images_auth_delete" on storage.objects
+  for delete to authenticated
+  using (bucket_id = 'site-images');
