@@ -4,8 +4,21 @@
     id="top"
     class="relative min-h-[92vh] flex items-center px-6 md:px-10 lg:px-16"
     style="padding-top: 120px; padding-bottom: 80px; background-image: linear-gradient(180deg, rgba(22,41,31,0.55) 0%, rgba(22,41,31,0.72) 65%, rgba(22,41,31,0.88) 100%), var(--hero-img); background-size: cover; background-position: center;"
-    :style="{ '--hero-img': `url(${data.hero.photo})` }"
+    :style="{ '--hero-img': `url(${heroImg})` }"
   >
+    <!-- Edit overlay -->
+    <button
+      v-if="editor.state.active"
+      @click="editor.startPicking('hero')"
+      class="absolute inset-0 z-20 flex flex-col items-center justify-center gap-2 w-full border-4 border-dashed transition-opacity opacity-0 hover:opacity-100"
+      style="background: rgba(0,0,0,0.45); border-color: rgba(255,255,255,0.5); cursor: pointer;"
+    >
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
+        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+        <circle cx="12" cy="13" r="4"/>
+      </svg>
+      <span class="text-white font-medium bg-black/40 px-4 py-1.5" style="font-size: 14px;">Cambiar foto del hero</span>
+    </button>
     <div class="container-content">
       <div class="max-w-[820px]">
         <p data-hero-eyebrow class="eyebrow-light mb-6">{{ data.hero.eyebrow }}</p>
@@ -71,12 +84,16 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useHeroReveal } from '../composables/useReveal.js'
+import { usePhotoEditor } from '../composables/usePhotoEditor.js'
 
 const props = defineProps({ data: Object })
 defineEmits(['cta', 'secondary'])
 
 const heroRef = ref(null)
+const editor  = usePhotoEditor()
+const heroImg = computed(() => editor.getImage('hero', props.data.hero.photo))
+
 useHeroReveal(heroRef)
 </script>

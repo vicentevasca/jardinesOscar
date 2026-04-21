@@ -24,18 +24,31 @@
           @mouseenter="hoveredKey = type.key"
           @mouseleave="hoveredKey = null"
         >
-          <div class="relative overflow-hidden" style="aspect-ratio: 4/3;">
+          <div class="relative overflow-hidden group/card" style="aspect-ratio: 4/3;">
             <div
               class="absolute inset-0 bg-cover bg-center transition-transform duration-700"
               style="transition-timing-function: cubic-bezier(0.22,0.61,0.36,1)"
               :style="{
-                backgroundImage: `url(${type.photo})`,
+                backgroundImage: `url(${editor.getImage('type_' + type.key, type.photo)})`,
                 transform: hoveredKey === type.key ? 'scale(1.06)' : 'scale(1)'
               }"
             />
             <div class="absolute top-3.5 left-3.5 bg-beige-100/92 text-green-800 uppercase tracking-[0.12em] px-2.5 py-1.5" style="font-size: 11px;">
               {{ type.tag }}
             </div>
+            <!-- Edit overlay -->
+            <button
+              v-if="editor.state.active"
+              @click.stop="editor.startPicking('type_' + type.key)"
+              class="absolute inset-0 z-10 flex flex-col items-center justify-center gap-1.5 opacity-0 group-hover/card:opacity-100 transition-opacity w-full border-0 cursor-pointer"
+              style="background: rgba(0,0,0,0.5);"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                <circle cx="12" cy="13" r="4"/>
+              </svg>
+              <span class="text-white font-medium" style="font-size: 12px;">Cambiar foto</span>
+            </button>
           </div>
 
           <div class="p-6 flex flex-col gap-3 flex-1">
@@ -73,6 +86,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useReveal } from '../composables/useReveal.js'
+import { usePhotoEditor } from '../composables/usePhotoEditor.js'
 
 defineProps({ data: Object })
 defineEmits(['quote'])
@@ -80,6 +94,7 @@ defineEmits(['quote'])
 const hoveredKey = ref(null)
 const headerRef  = ref(null)
 const cardsRef   = ref(null)
+const editor     = usePhotoEditor()
 
 useReveal(() => headerRef.value, { y: 24 })
 useReveal(() => cardsRef.value ? [...cardsRef.value.children] : null, { stagger: 0.07, y: 28, start: 'top 85%' })

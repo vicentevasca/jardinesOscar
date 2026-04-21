@@ -28,7 +28,7 @@
           :style="{
             gridColumn: spans[i]?.col,
             gridRow: spans[i]?.row,
-            backgroundImage: `url(${project.photo})`,
+            backgroundImage: `url(${editor.getImage('portfolio_' + i, project.photo)})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
           }"
@@ -37,7 +37,7 @@
             class="absolute inset-0 transition-opacity duration-500 group-hover:opacity-100"
             style="background: linear-gradient(180deg, rgba(22,41,31,0) 40%, rgba(22,41,31,0.82) 100%); opacity: 0.7;"
           />
-          <figcaption class="absolute inset-0 flex flex-col justify-end p-5 text-white">
+          <figcaption class="absolute inset-0 flex flex-col justify-end p-5 text-white" :style="editor.state.active ? 'z-20' : ''">
             <div class="uppercase tracking-[0.12em] text-green-200" style="font-size: 11px;">
               {{ project.style }} · {{ project.year }}
             </div>
@@ -46,17 +46,30 @@
             </div>
             <div class="text-white/80 mt-0.5" style="font-size: 12px;">{{ project.size }}</div>
           </figcaption>
+          <!-- Edit overlay -->
+          <button
+            v-if="editor.state.active"
+            @click.stop="editor.startPicking('portfolio_' + i)"
+            class="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity w-full border-0 cursor-pointer"
+            style="background: rgba(0,0,0,0.5);"
+          >
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+            <span class="text-white font-medium bg-black/40 px-3 py-1" style="font-size: 13px;">Cambiar foto</span>
+          </button>
         </figure>
       </div>
 
       <!-- Mobile 2-col grid -->
       <div class="md:hidden grid grid-cols-2 gap-3">
         <figure
-          v-for="project in data.portfolio"
+          v-for="(project, i) in data.portfolio"
           :key="project.title + '-m'"
           class="relative m-0 overflow-hidden cursor-pointer group"
           style="aspect-ratio: 3/4;"
-          :style="{ backgroundImage: `url(${project.photo})`, backgroundSize: 'cover', backgroundPosition: 'center' }"
+          :style="{ backgroundImage: `url(${editor.getImage('portfolio_' + i, project.photo)})`, backgroundSize: 'cover', backgroundPosition: 'center' }"
         >
           <div
             class="absolute inset-0"
@@ -75,8 +88,11 @@
 <script setup>
 import { ref } from 'vue'
 import { useReveal } from '../composables/useReveal.js'
+import { usePhotoEditor } from '../composables/usePhotoEditor.js'
 
 defineProps({ data: Object })
+
+const editor = usePhotoEditor()
 
 const spans = [
   { col: 'span 3', row: 'span 2' },

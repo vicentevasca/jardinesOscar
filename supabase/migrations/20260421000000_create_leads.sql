@@ -9,7 +9,8 @@ create table if not exists public.leads (
   tipo_jardin     text,
   tamano          text,
   presupuesto     text,
-  mensaje         text
+  mensaje         text,
+  read            boolean not null default false
 );
 
 alter table public.leads enable row level security;
