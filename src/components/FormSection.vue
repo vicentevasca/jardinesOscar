@@ -127,11 +127,15 @@
           />
         </div>
 
+        <div v-if="error" class="text-red-600 text-sm p-3 border border-red-200 bg-red-50">{{ error }}</div>
+
         <div class="flex justify-between items-center flex-wrap gap-4 mt-1">
           <p class="text-ink-500 max-w-[340px] m-0" style="font-size: 12px;">
             Al enviar, aceptas que te contactemos para coordinar una evaluación. No compartimos tus datos.
           </p>
-          <button type="submit" class="btn btn-primary btn-lg">Quiero mi evaluación gratuita</button>
+          <button type="submit" :disabled="loading" class="btn btn-primary btn-lg" :style="loading ? 'opacity:0.65;cursor:not-allowed' : ''">
+            {{ loading ? 'Enviando...' : 'Quiero mi evaluación gratuita' }}
+          </button>
         </div>
       </form>
     </div>
@@ -140,6 +144,7 @@
 
 <script setup>
 import { ref, watch } from 'vue'
+import { supabase } from '../lib/supabase.js'
 
 const props = defineProps({ data: Object, initialType: String })
 
@@ -149,7 +154,10 @@ const perks = [
   'Propuesta con paleta vegetal y presupuesto',
 ]
 
-const sent = ref(false)
+const sent    = ref(false)
+const loading = ref(false)
+const error   = ref('')
+
 const form = ref({
   nombre: '', telefono: '', email: '', comuna: '',
   tipoPropiedad: 'Casa', tipoJardin: '', mensaje: '',
@@ -160,8 +168,26 @@ watch(() => props.initialType, (val) => {
   if (val) form.value.tipoJardin = val
 }, { immediate: true })
 
-function onSubmit() {
-  sent.value = true
+async function onSubmit() {
+  loading.value = true
+  error.value = ''
+  const { error: err } = await supabase.from('leads').insert({
+    nombre:         form.value.nombre,
+    telefono:       form.value.telefono,
+    email:          form.value.email,
+    comuna:         form.value.comuna,
+    tipo_propiedad: form.value.tipoPropiedad,
+    tipo_jardin:    form.value.tipoJardin,
+    tamano:         form.value.tamano,
+    presupuesto:    form.value.presupuesto,
+    mensaje:        form.value.mensaje,
+  })
+  loading.value = false
+  if (err) {
+    error.value = 'Hubo un problema al enviar. Por favor escríbenos directamente por WhatsApp.'
+  } else {
+    sent.value = true
+  }
 }
 </script>
 
