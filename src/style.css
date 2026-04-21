@@ -1,0 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Absans';
+  src: url('/fonts/Absans-Regular.woff2') format('woff2'),
+       url('/fonts/Absans-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-beige-300 text-ink-900 font-body;
+    font-size: 17px;
+    line-height: 1.6;
+    margin: 0;
+  }
+}
+
+@layer components {
+  .eyebrow {
+    @apply font-body font-medium uppercase text-green-500;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+  }
+
+  .eyebrow-light {
+    @apply font-body font-medium uppercase text-green-200;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+  }
+
+  .btn {
+    @apply inline-flex items-center gap-2 font-medium rounded-sm transition-all duration-300 cursor-pointer border-0;
+    transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  .btn-primary {
+    @apply btn bg-green-800 text-white px-6 py-3 text-sm hover:bg-green-700 active:scale-95;
+  }
+
+  .btn-secondary {
+    @apply btn bg-transparent text-ink-900 px-6 py-3 text-sm border border-ink-900/20 hover:bg-ink-900/5 active:scale-95;
+  }
+
+  .btn-inverse {
+    @apply btn bg-beige-100 text-ink-900 px-6 py-3 text-sm hover:bg-white active:scale-95;
+  }
+
+  .btn-ghost {
+    @apply btn bg-transparent text-white px-6 py-3 text-sm border border-white/30 hover:bg-white/10 active:scale-95;
+  }
+
+  .btn-lg {
+    @apply px-8 py-4 text-base;
+  }
+
+  .btn-sm {
+    @apply px-4 py-2 text-xs;
+  }
+
+  .section-pad {
+    @apply px-6 py-24 md:px-10 lg:px-16;
+  }
+
+  .container-content {
+    max-width: 1280px;
+    @apply mx-auto w-full;
+  }
+}
